@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
+import "dotenv/config";
 import { Command } from "commander";
 import axios from "axios";
 import { execSync } from "child_process";
 import { fallbackScan } from "./fallback-scan.js";
 
-const DEFAULT_API = process.env.SAFE_INSTALL_API || "http://localhost:5000/scan";
+const DEFAULT_API = process.env.SAFE_INSTALL_API || "http://localhost:5000/api/scan";
 const BACKEND_TIMEOUT = Number(process.env.BACKEND_TIMEOUT || 30000);
 
 function shouldUseFallback(err) {
