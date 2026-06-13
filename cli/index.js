@@ -2,6 +2,7 @@
 
 import { Command } from "commander";
 import axios from "axios";
+import chalk from "chalk";
 import { execSync } from "child_process";
 import { fallbackScan } from "./fallback-scan.js";
 
@@ -27,37 +28,50 @@ async function scanPackage(pkg, apiUrl, allowFallback) {
       const reason = err.response?.status
         ? `HTTP ${err.response.status}`
         : err.code || err.message;
-      console.warn(`\n⚠ Backend unavailable (${reason}). Using local fallback scan...`);
+      console.warn(chalk.yellow(`\nWarning: Backend unavailable (${reason}). Using local fallback scan...`));
       return fallbackScan(pkg);
     }
     throw err;
   }
 }
-function printScanResult(data) {
 
-      if (data.package) {
-        console.log(`\n${data.package}@${data.version || "latest"}`);
-      }
-      if (data.severity) {
-        console.log(`Severity: ${data.severity}`);
-      }
-      if (data.explanation) {
-        console.log(`\n${data.explanation}`);
-      }
-      if (data.fix) {
-        console.log(`\nFix: ${data.fix}`);
-      }
-        if (data.source === "fallback") {
-    console.log("\n(source: local fallback — backend scan was not used)");
+// ==================== PROFESSIONAL OUTPUT ====================
+function printScanResult(data) {
+  console.log("\n" + "=".repeat(70));
+  console.log(` SCAN RESULT: ${data.package || data.pkg}@${data.version || "latest"}`);
+  console.log("=".repeat(70));
+
+  const severity = (data.severity || "NONE").toUpperCase();
+  const severityColor = 
+    severity === "CRITICAL" ? chalk.red.bold :
+    severity === "HIGH" ? chalk.red :
+    severity === "MEDIUM" ? chalk.yellow :
+    chalk.green;
+
+  console.log(severityColor(` Severity     : ${severity}`));
+
+  console.log(`\n Explanation  :`);
+  console.log(`   ${data.explanation}`);
+
+  if (data.fix) {
+    console.log(`\n Recommended Fix :`);
+    console.log(`   ${data.fix}`);
   }
+
+  if (data.source === "fallback") {
+    console.log(chalk.gray(`\n Note         : Using local fallback scan (backend was unavailable)`));
+  }
+
+  console.log("=".repeat(70) + "\n");
 }
+// ===========================================================
 
 const program = new Command();
 
 program
   .name("safe-install")
   .description("Safely install npm packages — backend scan with local fallback")
-  .argument("<package>", "npm package name (e.g. axios)")
+  .argument("<package>", "npm package name (e.g. axios or axios@1.0.0)")
   .option("-a, --api <url>", "backend scan API URL", DEFAULT_API)
   .option("-g, --global", "install globally (npm install -g)")
   .option("-D, --save-dev", "save as dev dependency")
@@ -65,27 +79,37 @@ program
   .option("--no-fallback", "require backend — fail if API is unreachable")
   .action(async (pkg, options) => {
     try {
-      const data = await scanPackage(pkg, options.api, options.fallback);
+      const data = await scanPackage(pkg, options.api, options.fallback !== false);
 
       printScanResult(data);
 
-      if (data.safe) {
-          if (options.dryRun) {
-          console.log("\n✅ Package is safe (dry-run — install skipped).");
-          return;
-        }
-        const flags = [];
-        if (options.global) flags.push("-g");
-        if (options.saveDev) flags.push("--save-dev");
-        const cmd = `npm install ${flags.join(" ")} ${pkg}`.replace(/\s+/g, " ").trim();
-        execSync(cmd, { stdio: "inherit" });
-      } else {
-        console.log("\n❌ Installation blocked.");
+      if (!data.safe) {
+        console.log(chalk.red.bold("\nInstallation BLOCKED by Safe-Install.\n"));
         process.exit(1);
       }
+
+      if (options.dryRun) {
+        console.log(chalk.green.bold("Dry-run completed successfully. Package is safe to install.\n"));
+        return;
+      }
+
+      console.log(chalk.blue(`Starting installation of ${pkg}...\n`));
+
+      const flags = [];
+      if (options.global) flags.push("-g");
+      if (options.saveDev) flags.push("--save-dev");
+
+      const cmd = `npm install ${flags.join(" ")} ${pkg}`.replace(/\s+/g, " ").trim();
+      execSync(cmd, { stdio: "inherit" });
+
+      console.log("\n" + "=".repeat(70));
+      console.log(chalk.green.bold(`SUCCESS: ${pkg} installed successfully`));
+      console.log("Package was verified as safe before installation.");
+      console.log("=".repeat(70) + "\n");
+
     } catch (err) {
       const msg = err.response?.data?.message || err.message;
-      console.error(`Scan failed: ${msg}`);
+      console.error(chalk.red(`Scan failed: ${msg}`));
       process.exit(1);
     }
   });
