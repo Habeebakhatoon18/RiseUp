@@ -1,19 +1,26 @@
 import { runSecurityScan } from "../services/securityEngine.js";
+import { isDatabaseConfigured } from "../config/database.js";
+import { ScanRecord } from "../models/ScanRecord.js";
 
-export async function scanPackage(req, res) {
+export async function scanPackage(req, res, next) {
   try {
-    const packageName = req.body?.package?.trim();
-    if (!packageName) {
-      return res.status(400).json({ error: "Missing required field: package" });
+    const result = await runSecurityScan(req.packageName);
+
+    if (isDatabaseConfigured()) {
+      await ScanRecord.create({
+        packageName: result.package,
+        version: result.version,
+        safe: result.safe,
+        severity: result.severity,
+        explanation: result.explanation,
+        observations: result.observations,
+        cves: result.cves,
+        fix: result.fix,
+      });
     }
 
-    const result = await runSecurityScan(packageName);
     return res.json(result);
   } catch (err) {
-    console.error("Scan error:", err.message);
-    return res.status(500).json({
-      error: "Scan failed",
-      message: err.message,
-    });
+    next(err);
   }
 }

@@ -1,36 +1,51 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+import helmet from "helmet";
 import scanRoutes from "./routes/scanRoute.js";
-
-dotenv.config();
+import { env } from "./config/env.js";
+import { getDatabaseStatus } from "./config/database.js";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+if (env.trustProxy) {
+  app.set("trust proxy", 1);
+}
 
-// Request logging middleware
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-});
+app.disable("x-powered-by");
 
-// Routes
-app.use("/api/scan", scanRoutes);
+app.use(helmet());
+app.use(
+  cors({
+    origin: env.corsOrigin === "*" ? true : env.corsOrigin.split(",").map((item) => item.trim()),
+    methods: ["GET", "POST"],
+  })
+);
+app.use(express.json({ limit: env.bodyLimit }));
+app.use(express.urlencoded({ extended: true, limit: env.bodyLimit }));
 
-// Health check endpoint
+if (!env.isProduction) {
+  app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+    next();
+  });
+}
+
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+  const db = getDatabaseStatus();
+  const healthy = !db.configured || db.ready;
+
+  res.status(healthy ? 200 : 503).json({
+    status: healthy ? "ok" : "degraded",
+    timestamp: new Date().toISOString(),
+    environment: env.nodeEnv,
+    database: db,
+  });
 });
 
-// Root endpoint
 app.get("/", (req, res) => {
   res.json({
-    message: "Package Security Scanner API",
+    name: "Safe Install API",
     version: "1.0.0",
     endpoints: {
       health: "GET /health",
@@ -39,24 +54,9 @@ app.get("/", (req, res) => {
   });
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: "Endpoint not found" });
-});
+app.use("/api/scan", scanRoutes);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error("Error:", err);
-  res.status(err.status || 500).json({
-    error: err.message || "Internal server error",
-    status: err.status || 500,
-  });
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Package Security Scanner API running on port ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/health`);
-});
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 export default app;
