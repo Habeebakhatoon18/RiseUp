@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 /**
  * Stand-in backend for CLI testing. Simulates POST /scan responses
  * until the real scanner is implemented.
