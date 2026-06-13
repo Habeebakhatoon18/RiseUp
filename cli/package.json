@@ -1,0 +1,27 @@
+{
+  "name": "safe-install",
+  "version": "1.0.0",
+  "description": "Safely install npm packages via backend security scan",
+  "type": "module",
+  "bin": {
+    "safe-install": "./index.js"
+  },
+  "keywords": [
+    "npm",
+    "security",
+    "cli",
+    "supply-chain"
+  ],
+  "license": "MIT",
+    "scripts": {
+    "mock-server": "node mock-server.js",
+    "test:blocked": "node index.js bad-package",
+    "test:safe": "node index.js --dry-run lodash",
+    "test:fallback": "node index.js --dry-run lodash --api http://localhost:5999/scan"
+  },
+  "dependencies": {
+    "axios": "^1.17.0",
+    "commander": "^12.1.0",
+    "lodash": "^4.18.1"
+  }
+}
