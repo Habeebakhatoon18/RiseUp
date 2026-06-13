@@ -1,19 +1,28 @@
 {
-  "name": "backend",
+  "name": "safe-install-backend",
   "version": "1.0.0",
-  "main": "app.js",
-   "type": "module",
+  "description": "Production API for npm package security scanning",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test tests/"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["npm", "security", "scanner"],
   "license": "ISC",
-  "description": "",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "axios": "^1.17.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0",
+    "mongoose": "^8.19.1",
+    "tar": "^7.5.1"
   }
 }
