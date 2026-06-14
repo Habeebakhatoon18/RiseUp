@@ -39,36 +39,64 @@ async function scanPackage(pkgSpec, apiUrl, allowFallback) {
   }
 }
 
-// ==================== PROFESSIONAL OUTPUT ====================
+function severityColor(severity) {
+  const label = (severity || "NONE").toUpperCase();
+  if (label === "CRITICAL") return chalk.red.bold;
+  if (label === "HIGH") return chalk.red;
+  if (label === "MEDIUM") return chalk.yellow;
+  if (label === "ERROR") return chalk.magenta.bold;
+  return chalk.green;
+}
+
+function printSection(title, body) {
+  if (!body) return;
+  console.log(`\n${title}`);
+  console.log("");
+  const lines = String(body).split("\n");
+  for (const line of lines) {
+    console.log(` ${line}`);
+  }
+}
+
+function printFindings(findings = []) {
+  if (!findings.length) return;
+
+  console.log("\nFindings:");
+  console.log("");
+  for (const item of findings) {
+    console.log(` • ${item}`);
+  }
+}
+
 function printScanResult(data) {
   console.log("\n" + "=".repeat(70));
   console.log(` SCAN RESULT: ${data.package || data.pkg}@${data.version || "latest"}`);
   console.log("=".repeat(70));
 
   const severity = (data.severity || "NONE").toUpperCase();
-  const severityColor = 
-    severity === "CRITICAL" ? chalk.red.bold :
-    severity === "HIGH" ? chalk.red :
-    severity === "MEDIUM" ? chalk.yellow :
-    chalk.green;
+  console.log(severityColor(severity)(`\n Severity     : ${severity}`));
 
-  console.log(severityColor(` Severity     : ${severity}`));
+  const why = data.why || data.explanation;
+  const impact = data.impact;
+  const recommendedFix = data.recommendedFix || data.fix;
+  const saferAlternative = data.saferAlternative;
 
-  console.log(`\n Explanation  :`);
-  console.log(`   ${data.explanation}`);
-
-  if (data.fix) {
-    console.log(`\n Recommended Fix :`);
-    console.log(`   ${data.fix}`);
+  if (data.safe) {
+    printSection("Why is it safe?", why);
+  } else {
+    printSection("Why was it flagged?", why);
   }
+  printSection("Impact:", impact);
+  printSection("Recommended Fix:", recommendedFix);
+  printSection("Safer Alternative:", saferAlternative);
+  printFindings(data.findings);
 
   if (data.source === "fallback") {
-    console.log(chalk.gray(`\n Note         : Using local fallback scan (backend was unavailable)`));
+    console.log(chalk.gray("\n Note         : Using local fallback scan (backend was unavailable)"));
   }
 
-  console.log("=".repeat(70) + "\n");
+  console.log("\n" + "=".repeat(70) + "\n");
 }
-// ===========================================================
 
 const program = new Command();
 
@@ -88,7 +116,7 @@ program
       printScanResult(data);
 
       if (!data.safe) {
-        console.log(chalk.red.bold("\nInstallation BLOCKED by Safe-Install.\n"));
+        console.log(chalk.red.bold("Installation BLOCKED by Safe-Install.\n"));
         process.exit(1);
       }
 
@@ -110,7 +138,6 @@ program
       console.log(chalk.green.bold(`SUCCESS: ${pkg} installed successfully`));
       console.log("Package was verified as safe before installation.");
       console.log("=".repeat(70) + "\n");
-
     } catch (err) {
       const msg =
         err.response?.data?.error ||
