@@ -3,7 +3,10 @@ import { env } from "./config/env.js";
 import { connectDatabase, disconnectDatabase } from "./config/database.js";
 
 async function startServer() {
-  await connectDatabase();
+  const dbConnected = await connectDatabase();
+  if (!dbConnected) {
+    console.warn("[server] Starting without database connection");
+  }
 
   const server = app.listen(env.port, () => {
     console.log(`Safe Install API listening on port ${env.port} (${env.nodeEnv})`);

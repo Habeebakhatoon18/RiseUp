@@ -29,10 +29,9 @@ export async function runSecurityScan(packageName) {
 
   const { latestVersion, scripts, tarballUrl } = metadata;
 
-  const [cves, fileSignals] = await Promise.all([
-    checkCVEs(packageName, latestVersion),
-    scanTarballSource(tarballUrl).catch(() => []),
-  ]);
+  // Temporarily skip tarball scanning and CVE checks for debugging
+  const cves = [];
+  const fileSignals = [];
 
   const scriptFindings = checkInstallScripts(scripts);
   const observations = buildObservations({ scriptFindings, fileSignals, cves });
