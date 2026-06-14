@@ -4,7 +4,7 @@ import { ScanRecord } from "../models/ScanRecord.js";
 
 export async function scanPackage(req, res, next) {
   try {
-    const result = await runSecurityScan(req.packageName);
+    const result = await runSecurityScan(req.packageName, req.packageVersion);
 
     if (isDatabaseConfigured()) {
       await ScanRecord.create({

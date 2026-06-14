@@ -7,6 +7,20 @@ const KNOWN_UNSAFE = {
     fix: "Do not install. Use a vetted alternative.",
     safe: false,
   },
+  "demo-block-postinstall": {
+    version: "1.0.0",
+    severity: "critical",
+    explanation:
+      "[DEMO] Malicious postinstall simulation — curl | bash during install.",
+    fix: "Do not install. Demo of typosquat install-hook attack.",
+    safe: false,
+  },
+  "demo-safe-package": {
+    version: "1.0.0",
+    severity: "none",
+    explanation: "[DEMO] Clean package simulation.",
+    safe: true,
+  },
 };
 
 export function scanPackageRules(pkg) {

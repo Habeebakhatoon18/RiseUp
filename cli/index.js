@@ -6,6 +6,7 @@ import axios from "axios";
 import chalk from "chalk";
 import { execSync } from "child_process";
 import { fallbackScan } from "./fallback-scan.js";
+import { parsePackageSpec } from "./parsePackageSpec.js";
 
 const DEFAULT_API = process.env.SAFE_INSTALL_API || "http://localhost:5000/api/scan";
 const BACKEND_TIMEOUT = Number(process.env.BACKEND_TIMEOUT || 30000);
@@ -16,11 +17,13 @@ function shouldUseFallback(err) {
   return status >= 502 && status <= 504;
 }
 
-async function scanPackage(pkg, apiUrl, allowFallback) {
+async function scanPackage(pkgSpec, apiUrl, allowFallback) {
+  const { name, version } = parsePackageSpec(pkgSpec);
+
   try {
     const { data } = await axios.post(
       apiUrl,
-      { package: pkg },
+      { package: name, ...(version ? { version } : {}) },
       { timeout: BACKEND_TIMEOUT }
     );
     return { ...data, source: "backend" };
@@ -30,7 +33,7 @@ async function scanPackage(pkg, apiUrl, allowFallback) {
         ? `HTTP ${err.response.status}`
         : err.code || err.message;
       console.warn(chalk.yellow(`\nWarning: Backend unavailable (${reason}). Using local fallback scan...`));
-      return fallbackScan(pkg);
+      return fallbackScan(name);
     }
     throw err;
   }
@@ -109,7 +112,10 @@ program
       console.log("=".repeat(70) + "\n");
 
     } catch (err) {
-      const msg = err.response?.data?.message || err.message;
+      const msg =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.message;
       console.error(chalk.red(`Scan failed: ${msg}`));
       process.exit(1);
     }

