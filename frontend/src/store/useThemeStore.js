@@ -26,7 +26,7 @@ export const useThemeStore = create(
       },
     }),
     {
-      name: 'safe-install-theme',
+      name: 'sentrix-theme',
       onRehydrateStorage: () => (state) => {
         if (state) applyTheme(state.theme)
       },

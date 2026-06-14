@@ -60,10 +60,10 @@ function Layout({ children }) {
                 <span
                   className={`flex h-9 w-9 items-center justify-center rounded-xl font-bold text-sm shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg ${logoIcon}`}
                 >
-                  SI
+                  SX
                 </span>
                 <span className={`font-bold text-lg tracking-tight transition-colors ${logoText}`}>
-                  Safe Install
+                  SentriX
                 </span>
               </a>
 
@@ -156,9 +156,9 @@ function Layout({ children }) {
             <div>
               <div className="flex items-center gap-2.5 mb-4">
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-cyan-500 text-white font-bold text-xs shadow-lg">
-                  SI
+                  SX
                 </span>
-                <span className="text-base font-bold">Safe Install</span>
+                <span className="text-base font-bold">SentriX</span>
               </div>
               <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-xs">
                 Protect your supply chain with AI-powered npm package analysis.
@@ -188,7 +188,7 @@ function Layout({ children }) {
           </div>
           <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-500 dark:text-slate-500">
-              &copy; {new Date().getFullYear()} Safe Install. All rights reserved.
+              &copy; {new Date().getFullYear()} SentriX. All rights reserved.
             </p>
             <div className="flex items-center gap-2 rounded-full bg-slate-200/80 dark:bg-slate-800/80 px-4 py-2">
               <span className="relative flex h-2 w-2">

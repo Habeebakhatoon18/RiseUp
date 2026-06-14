@@ -66,7 +66,7 @@ function InteractiveTerminal({ activeDemo = 0, tiltStyle = {}, onMouseEnter, onM
     setIsTyping(true)
     setProgress(0)
 
-    const command = `safe-install ${demo.package}`
+    const command = `sentrix scan ${demo.package}`
     let charIndex = 0
 
     const progressInterval = setInterval(() => {
@@ -113,7 +113,7 @@ function InteractiveTerminal({ activeDemo = 0, tiltStyle = {}, onMouseEnter, onM
             <span className={`flex-shrink-0 h-3 w-3 rounded-full ${theme.terminal.trafficMin}`} />
             <span className={`flex-shrink-0 h-3 w-3 rounded-full ${theme.terminal.trafficMax}`} />
             <span className="ml-2 text-xs font-medium text-slate-500 tracking-wide truncate">
-              safe-install — zsh
+              sentrix — zsh
             </span>
           </div>
           <span
