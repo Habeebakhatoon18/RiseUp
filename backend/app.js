@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import scanRoutes from "./routes/scanRoute.js";
+import analyticsRoutes from "./routes/analyticsRoute.js";
 import { env } from "./config/env.js";
 import { getDatabaseStatus } from "./config/database.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
@@ -55,6 +56,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/scan", scanRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

@@ -13,14 +13,19 @@ export async function connectDatabase() {
     return false;
   }
 
-  await mongoose.connect(env.mongodbUri, {
-    maxPoolSize: 10,
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 45000,
-  });
+  try {
+    await mongoose.connect(env.mongodbUri, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
 
-  console.log("[db] Connected to MongoDB");
-  return true;
+    console.log("[db] Connected to MongoDB");
+    return true;
+  } catch (error) {
+    console.warn("[db] MongoDB connection failed — running without persistence:", error.message);
+    return false;
+  }
 }
 
 export async function disconnectDatabase() {
