@@ -435,33 +435,8 @@ Use these during hackathon judging or portfolio walkthroughs:
 
 ---
 
-## Resume Highlights
 
-Copy-paste friendly bullets for your resume or LinkedIn:
 
-- Built **Safe Install**, a full-stack npm supply chain security platform with CLI, REST API, and React dashboard serving scan-then-install workflows
-- Engineered a **multi-layer security scanner** combining install-script pattern matching, tarball static analysis, OSV CVE lookups, and Google Gemini AI explanations
-- Designed **offline-first CLI architecture** with automatic backend fallback, rate-limited Express API, and MongoDB-backed analytics dashboard
-- Implemented **risk scoring engine** with severity aggregation (`none`–`critical`) that blocks `npm install` for packages with medium+ risk findings
-- Tech: **Node.js, Express, React, MongoDB, Google Gemini AI, Tailwind CSS, Zustand, Commander.js**
-
-**One-liner for project section:**
-
-> *Safe Install — AI-powered npm package scanner that detects malicious install scripts, CVEs, and suspicious source code before installation. Full-stack: Node.js API, React dashboard, CLI tool.*
-
----
-
-## Roadmap
-
-- [ ] Re-enable full tarball scanning and CVE checks in production pipeline
-- [ ] Add `GET /api/scan/:package` for frontend parity
-- [ ] Typosquatting detection (Levenshtein distance against popular packages)
-- [ ] GitHub Action for CI/CD integration (`safe-install/action`)
-- [ ] VS Code extension for inline package warnings
-- [ ] npm publish of `safe-install` CLI package
-- [ ] Webhook alerts for critical findings in team dashboards
-
----
 
 ## License
 
