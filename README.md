@@ -171,7 +171,7 @@ When you scan a package (e.g. `axios`), the security engine runs this pipeline:
 ## Project Structure
 
 ```
-dummypackage/
+SentriAI/
 ├── backend/                  # Express API & security engine
 │   ├── config/               # Environment & database config
 │   ├── controllers/          # Scan & analytics request handlers
